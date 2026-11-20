@@ -513,8 +513,19 @@ function render(){
   else if(active==="Development Style & AI"){
     p.innerHTML=`<h2>Development Style & AI — ${selectedCity}</h2>
     <div class="grid g4">${card("City",selectedCity)}${card("Tier","Tier "+c.tier)}${card("Development Style",c.style)}${card("Transit Recommendation",c.transit)}</div>
-    <div class="note"><b>City AI models:</b> TransitAI, UrbanAI, ThamesAI, TradeAI, PlantationAI, HydelAI and AirlineAI. No Flood AI model is included. Scores and evidence requirements are shown in the dedicated city rating page.</div>
-    <a class="route-link" href="/city-ai-rating.html">Open City AI Rating</a>
+    <h3 style="margin:18px 0 6px">Seven-model city AI suitability scorecard</h3>
+    <p class="sub">The updated scorecard separates river-flood intelligence from urban drainage and evaluates city/catchment potential across seven distinct AI models.</p>
+    ${tbl([
+      ["TradeAI","Export demand, industrial capacity and logistics","District exports, industry and logistics records"],
+      ["ThamesAI","River exposure, catchment rainfall and flood-defence need","River gauges, hydrology and flood maps"],
+      ["UrbanAI","Urban rainfall, drainage and pumping requirements","Drainage inventory, rainfall and pumping data"],
+      ["TransitAI","Passenger demand, corridor density and connectivity","Origin–destination, road-width and transport studies"],
+      ["PlantationAI","Suitable land, carbon potential and environmental fit","Land-use, agronomy, ecology and permissions"],
+      ["HydelAI","Hydel assets, catchment proximity and grid readiness","Asset register, catchment and grid data"],
+      ["AirlineAI","Passenger demand, airport access and route economics","Airport catchment, route demand and operating evidence"]
+    ],["AI model","City suitability factors","Evidence required"])}
+    <div class="note"><b>Scoring safeguards:</b> scores are illustrative planning scenarios until verified city evidence is entered. AirlineAI uses city/catchment access (not just an airport inside city limits); PlantationAI and HydelAI depend on permissions and feasible assets. FloodAI is not a separate model—river flood risk is ThamesAI, while urban drainage remains UrbanAI.</div>
+    <a class="route-link" href="/city-ai-rating.html">Open the interactive scorecard and enter evidence</a>
     <div class="note"><b>Transit rule:</b> Tier 1 = metro + suburban/regional rail. Tier 2 = tram/light rail/BRT according to demand and urban form. Tier 3 = infrastructure-led using road width, ROW, demand, junction constraints, existing connectivity and growth.</div>`;
   }
 
