@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Wellington AI | TN Integrated Governance System</title>
+<style>
+:root{
+  --bg:#f7f8fa;--panel:#fff;--text:#17202a;--muted:#667085;--line:#d9dee7;
+  --accent:#1f5fbf;--soft:#eef4ff;--good:#eaf7ee;--warn:#fff7df;--bad:#fdecec;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+.wrap{max-width:1280px;margin:0 auto;padding:18px}
+.hero{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}
+.kicker{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-size:22px;margin:6px 0 4px}
+h2{font-size:18px;margin:4px 0 10px}
+.sub{color:var(--muted);font-size:14px}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+.tab{border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 12px;cursor:pointer;font-size:13px}
+.tab.active{background:var(--soft);border-color:#aac5f3;font-weight:700}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}
+.grid{display:grid;gap:12px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.card{background:#fafbfc;border:1px solid #edf0f4;border-radius:12px;padding:12px}
+.label{font-size:12px;color:var(--muted)}
+.value{font-size:18px;font-weight:700;margin-top:4px}
+.controls{background:#fafbfc;border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0}
+.controls label{font-size:12px;color:var(--muted)}
+select,input[type=number],input[type=month],input[type=text],input[type=url]{width:100%;padding:10px;margin-top:5px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--text)}
+button.action{padding:10px 14px;border:1px solid var(--line);border-radius:9px;background:var(--soft);cursor:pointer;font-weight:700}.status{display:inline-block;padding:5px 9px;border-radius:999px;font-size:12px;font-weight:700}.status.live{background:#eaf7ee}.status.manual{background:#fff7df}.status.offline{background:#fdecec} code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+input[type=range]{width:100%}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
+th,td{text-align:left;padding:9px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--muted)}
+.note{margin-top:12px;background:#fafbfc;border-radius:10px;padding:12px;font-size:13px;color:#344054}
+.project{border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px;background:#fff}
+.project h3{margin:0 0 8px;font-size:16px}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700}
+.good{background:var(--good)} .warn{background:var(--warn)} .bad{background:var(--bad)}
+@media(max-width:850px){.g5,.g4,.g3,.g2{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.g5,.g4,.g3,.g2{grid-template-columns:1fr}}
+
+.brandbar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}
+.brand{font-weight:800;color:var(--accent);font-size:14px}.brand small{display:block;color:var(--muted);font-weight:500;font-size:11px}
+.introgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:14px}
+.introitem{border:1px solid var(--line);background:#fff;border-radius:12px;padding:11px;font-size:12px;line-height:1.35}
+.introitem b{display:block;margin-bottom:3px}
+.aircraft-visual{position:relative;min-height:260px;border-radius:18px;padding:22px;overflow:hidden;background:linear-gradient(135deg,#0d3f73,#1f6cb2 55%,#b8e1ff);color:white;border:1px solid #0b477d}
+.aircraft-visual:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 75% 25%,rgba(255,255,255,.28),transparent 30%),linear-gradient(160deg,transparent 52%,rgba(255,255,255,.15) 53%,transparent 54%)}
+.plane{position:absolute;left:42%;top:42%;font-size:74px;transform:rotate(-8deg);filter:drop-shadow(0 8px 10px rgba(0,0,0,.3))}
+.route{position:absolute;border-top:3px dashed rgba(255,255,255,.75);width:34%;height:1px;transform-origin:left center}
+.route.eu{left:15%;top:35%;transform:rotate(-12deg)} .route.sg{left:51%;top:63%;transform:rotate(16deg)}
+.route-label{position:absolute;font-weight:800;font-size:14px}.eu-label{left:7%;top:24%}.sg-label{right:7%;bottom:19%}
+.flight-copy{position:absolute;left:22px;bottom:20px;max-width:310px;font-size:12px;line-height:1.4}
+.gauge{--p:50;position:relative;width:140px;height:82px;overflow:hidden;margin:auto}
+.gauge:before{content:"";position:absolute;width:140px;height:140px;border-radius:50%;background:conic-gradient(from 270deg,#28a745 calc(var(--p)*1.8deg),#e7ebf0 0 180deg,transparent 0);top:12px;left:0}
+.gauge:after{content:"";position:absolute;width:90px;height:90px;border-radius:50%;background:white;left:25px;top:37px}
+.gauge .gv{position:absolute;z-index:2;width:100%;text-align:center;top:49px;font-weight:800;font-size:18px}
+.metercard{text-align:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px}.metercard .label{min-height:28px}
+.country-chip{display:inline-block;background:#eef4ff;border:1px solid #aac5f3;border-radius:999px;padding:8px 12px;margin:4px;font-size:12px;font-weight:700}
+@media(max-width:760px){.wrap{padding:10px}.hero,.panel{padding:13px}.tabs{flex-wrap:nowrap;overflow-x:auto;padding-bottom:8px}.tab{white-space:nowrap}.introgrid{grid-template-columns:1fr}.aircraft-visual{min-height:310px}.plane{font-size:58px;left:38%;top:42%}.gauge{transform:scale(.9)}}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="kicker">Tamil Nadu Integrated Governance System</div>
+    <h1>TN Integrated Governance System</h1><div class="sub"><b>Powered by Wellington AI.</b> A Tamil Nadu-only governance, economic-development and investment simulation linking actual data, monthwise snapshots and manual scenarios across departments, cities and strategic projects.</div><div class="sub" style="margin-top:8px">Simulation Engine 1 and Simulation Engine 2 retain a Real-Time selector with Live Source Feed, Monthwise Actual Snapshot and Manual Simulation. Live mode records the source website/API and retrieval timestamp; monthwise mode replays a selected historical month; manual mode keeps editable scenario inputs.</div>
+  </div>
+
+  <div id="tabs" class="tabs"></div>
+  <div id="panel" class="panel"></div>
+  <div class="sub" style="text-align:center;padding:16px 4px">Wellington AI • TN Integrated Governance System (TN-IGS) • Responsive simulation for desktop, mobile and tablet browsers<br><span style="font-size:11px">Anonymous usage analytics enabled for view counts and campaign/source tracking. No email address is collected by default.</span></div>
+</div>
+
+<script>
+const tabs = [
+"Home","Simulation Engine 1","Simulation Engine 2","Aircraft Indicator","Management Dashboard",
+"Ease of Doing Business","Ease of Doing Business Economic Value","City Indicator","Sustainability & Liveability",
+"Development Style & AI","Investment Bridge","India City Benchmark","State Industrial Benchmark",
+"Govt Revenue Enhancement"
+];
+
+const departments = {
+"Industries":{score:85.3,ab:90.3,q:87,gc:84,val:92,place:83,capacity:120},
+"Finance":{score:87.4,ab:91.0,q:91,gc:82,val:90,place:80,capacity:100},
+"Transport":{score:80.6,ab:84.2,q:82,gc:85,val:85,place:81,capacity:90},
+"Municipal Administration":{score:79.8,ab:83.5,q:81,gc:86,val:84,place:82,capacity:105},
+"Water Resources":{score:82.7,ab:88.4,q:84,gc:90,val:86,place:85,capacity:75},
+"Energy":{score:84.9,ab:89.6,q:86,gc:87,val:91,place:82,capacity:80},
+"Revenue & Land":{score:74.6,ab:78.8,q:77,gc:79,val:80,place:72,capacity:110},
+"Rural Development":{score:81.8,ab:87.1,q:83,gc:90,val:82,place:86,capacity:95},
+"Tourism":{score:82.9,ab:86.0,q:83,gc:85,val:86,place:88,capacity:85},
+"IT & Digital Services":{score:89.4,ab:93.0,q:92,gc:83,val:94,place:81,capacity:130}
+};
+
+const industries=[
+["Automobile & EV",7.8,9.3,281.78],["Electronics & Semiconductor",7.5,9.4,425.03],
+["Textiles & Apparel",7.9,9.2,126.09],["IT / ITeS & GCC",8.3,9.5,120.75],
+["Renewable Energy",7.4,9.3,382.77],["Food Processing",7.6,9.2,135.21],
+["Pharma & Medical Devices",7.7,9.4,199.62],["Engineering & Machinery",7.8,9.3,213.34],
+["Leather & Footwear",7.5,9.1,75.06],["Tourism & Hospitality",7.3,9.0,71.16]
+];
+
+const cities={
+"Chennai":{tier:1,cluster:"IT/GCC/AI + Auto/EV/Electronics",cur:8.8,target:9.6,inv:4.5,jobs:85000,econ:9.5,style:"Asia–EU hybrid",transit:"Metro + suburban/regional rail",s:[72,68,58,52,78],t:[92,88,82,82,92]},
+"Coimbatore":{tier:2,cluster:"Engineering/Machinery + EV/IT/Aerospace",cur:8.2,target:9.3,inv:2.2,jobs:42000,econ:8.7,style:"EU–Asia engineering model",transit:"Tram / Light Rail + regional rail",s:[78,76,72,70,66],t:[94,92,90,88,86]},
+"Tiruchirappalli":{tier:2,cluster:"Heavy Engineering + Energy/Defence",cur:8.0,target:9.2,inv:1.8,jobs:33000,econ:8.4,style:"EU industrial cluster model",transit:"Tram / Light Rail",s:[78,79,70,68,60],t:[95,94,90,88,84]},
+"Madurai":{tier:2,cluster:"Healthcare/Tourism + IT/Food",cur:7.6,target:9.0,inv:1.4,jobs:30000,econ:8.0,style:"EU–Asia hybrid",transit:"Tram/BRT first",s:[73,75,68,62,62],t:[93,92,88,86,84]},
+"Salem":{tier:2,cluster:"Metals/Engineering + EV/Textiles",cur:7.5,target:8.9,inv:1.3,jobs:28000,econ:7.8,style:"EU industrial city model",transit:"Tram/BRT",s:[74,78,65,67,58],t:[92,92,86,86,82]},
+"Tiruppur":{tier:2,cluster:"Textiles/Apparel + Circular Textiles",cur:8.4,target:9.4,inv:1.6,jobs:36000,econ:8.3,style:"EU MSME/export model",transit:"Tram/BRT",s:[70,74,62,63,57],t:[92,90,86,85,82]},
+"Hosur":{tier:3,cluster:"Auto/EV + Electronics/Advanced Manufacturing",cur:8.5,target:9.5,inv:2.5,jobs:45000,econ:8.8,style:"Advanced manufacturing satellite",transit:"Infrastructure-led: regional rail/BRT/tram",s:[72,70,60,58,65],t:[93,91,88,86,88]},
+"Erode":{tier:3,cluster:"Textiles/Agro + Food/Logistics",cur:7.4,target:8.8,inv:.9,jobs:22000,econ:7.3,style:"Agro/MSME network",transit:"Infrastructure-led: e-bus/BRT/regional rail",s:[74,78,68,66,58],t:[92,92,87,85,82]},
+"Vellore":{tier:3,cluster:"Healthcare/Leather + MedTech/Education",cur:7.5,target:8.9,inv:1.0,jobs:20000,econ:7.5,style:"Knowledge/health regional model",transit:"Infrastructure-led: BRT/e-bus/regional rail",s:[75,72,68,62,60],t:[93,91,88,84,84]},
+"Thoothukudi":{tier:3,cluster:"Port/Logistics + Renewables/Green Industry",cur:7.8,target:9.2,inv:2.0,jobs:32000,econ:8.1,style:"Trade gateway + green industry",transit:"Port rail/BRT/worker mobility",s:[76,82,75,73,55],t:[95,95,92,90,82]},
+"Tirunelveli":{tier:3,cluster:"Renewable Energy + Electronics/Agro",cur:7.2,target:8.8,inv:1.1,jobs:24000,econ:7.1,style:"Green regional centre",transit:"Regional rail/e-bus/BRT",s:[75,80,72,68,58],t:[93,93,90,87,82]}
+};
+
+let active="Home";
+let selectedCity="Coimbatore";
+let focusCountry="Germany";
+let sim1={dept:"Industries",files:1000,period:12,complexity:1.0,dataMonth:"2026-09",dataMode:"Monthwise Actual Snapshot"};
+let sim2={dept:"Industries",files:250,gc:84,eco:94,place:86,quality:88,compliance:92,jobs:87,strategic:86,brand:84,fiscal:80,dataMonth:"2026-09",dataMode:"Monthwise Actual Snapshot"};
+let integration={
+  apiBase:"http://localhost:8000/api/v1",
+  connected:false,
+  lastRefresh:"Not connected",
+  source:"Local demonstration dataset",
+  sourceWebsite:"Configured source API / website",
+  sourceTimestamp:"Not retrieved"
+};
+
+async function loadActualData(engine){
+  const state = engine===1 ? sim1 : sim2;
+  if(state.dataMode!=="Live Source Feed") return;
+  try{
+    const endpoint = engine===1 ? "/simulation1" : "/simulation2";
+    const url = integration.apiBase + endpoint + "?department=" + encodeURIComponent(state.dept) + "&month=" + encodeURIComponent(state.dataMonth);
+    const r = await fetch(url,{headers:{"Accept":"application/json"}});
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    const d = await r.json();
+    if(engine===1){
+      if(d.files!=null) sim1.files=Number(d.files);
+      if(d.period!=null) sim1.period=Number(d.period);
+      if(d.complexity!=null) sim1.complexity=Number(d.complexity);
+    }else{
+      ["files","gc","eco","place","quality","compliance","jobs","strategic","brand","fiscal"].forEach(k=>{
+        if(d[k]!=null) sim2[k]=Number(d[k]);
+      });
+    }
+    integration.connected=true;
+    integration.lastRefresh=new Date().toLocaleString();
+    integration.source="Live source API / database"; integration.sourceTimestamp=new Date().toISOString();
+  }catch(e){
+    integration.connected=false;
+    integration.lastRefresh="Connection failed: "+e.message;
+    integration.source="Local fallback dataset"; integration.sourceTimestamp="Connection failed";
+  }
+  render();
+}
+
+function card(a,b,c=""){return `<div class="card"><div class="label">${a}</div><div class="value">${b}</div>${c?`<div class="label" style="margin-top:4px">${c}</div>`:""}</div>`}
+
+function gaugeCard(label,value,max=100,display=null){
+  const p=Math.max(0,Math.min(100,(Number(value)/max)*100));
+  return `<div class="metercard"><div class="label">${label}</div><div class="gauge" style="--p:${p}"><div class="gv">${display??Number(value).toFixed(0)}</div></div></div>`;
+}
+function tbl(rows,heads){return `<div style="overflow:auto"><table><thead><tr>${heads.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`}
+function cr(x){return "₹"+Math.round(x).toLocaleString()+" cr"}
+function optionList(obj,selected){return Object.keys(obj).map(k=>`<option ${k===selected?"selected":""}>${k}</option>`).join("")}
+
+function calcSim1(){
+  const d=departments[sim1.dept], f=sim1.files, months=sim1.period, comp=sim1.complexity;
+  const workload=f*comp, monthly=f/months;
+  const util=Math.min(130,(monthly/d.capacity)*100);
+  const score=Math.max(0,Math.min(100,d.score-Math.max(0,util-100)*0.08+(1.1-comp)*3));
+  const ab=Math.max(0,Math.min(100,d.ab-Math.max(0,util-100)*0.10));
+  const A=Math.round(f*(ab/100)*0.55), B=Math.round(f*(ab/100)*0.45);
+  const rem=f-A-B, C=Math.round(rem*0.7), D=f-A-B-C;
+  const performance=workload*(score/100)*(d.q/100)*(d.gc/100);
+  return {d,f,months,comp,workload,monthly,util,score,ab,A,B,C,D,performance};
+}
+function calcSim2(){
+  const s=sim2, qc=(s.quality+s.compliance)/2;
+  const score=.20*s.gc+.15*s.eco+.15*s.place+.15*qc+.10*s.jobs+.10*s.strategic+.10*s.brand+.05*s.fiscal;
+  let cls="D"; if(s.compliance>=70) cls=score>=85?"A":score>=70?"B":score>=50?"C":"D";
+  const sh=cls==="A"?[.55,.30,.10,.05]:cls==="B"?[.30,.45,.18,.07]:cls==="C"?[.15,.35,.40,.10]:[.05,.15,.35,.45];
+  const counts=sh.map(x=>Math.round(s.files*x));counts[3]+=s.files-counts.reduce((a,b)=>a+b,0);
+  const rework=counts[3]+Math.round(counts[2]*.15);
+  return {score,cls,counts,rework};
+}
+function aircraft(){
+  const s1=calcSim1(), s2=calcSim2(), eodb=7.68, gap=1.59, approval=28.9, target=15.2;
+  const weightedQuality=s1.d.q, weightedValue=s1.d.val;
+  const direction=weightedQuality<weightedValue-3?"NORTH — EU":(eodb<8||approval>target*1.4?"SOUTH — SINGAPORE":"TRANSIT / HYBRID");
+  const altitude=(s1.score+s2.score)/2;
+  const headwind=Math.min(100,35+gap*12+Math.max(0,approval-target));
+  const tailwind=Math.min(100,70+(eodb-7)*10);
+  const thrust=Math.max(0,Math.min(100,.4*(100-altitude)+.3*headwind-.2*tailwind+.1*(gap*10)+25));
+  const nav=(weightedQuality+sim2.quality)/2;
+  const deviation=Math.abs(90-altitude);
+  const status=thrust<20?"CRUISE":thrust<40?"LIGHT THRUST":thrust<60?"MODERATE THRUST":"MAXIMUM THRUST";
+  return {direction,altitude,headwind,tailwind,thrust,nav,deviation,status};
+}
+
+function managementImpact(){
+  const s1=calcSim1(), s2=calcSim2();
+  // Baseline economic values are the approved TN EoDB analytical model. They are scaled by
+  // the live Simulation 1 portfolio score, Simulation 2 public-value score and simulated volume.
+  const qualityFactor=(s1.score/85.2855)*(s2.score/88.4);
+  const volumeFactor=Math.max(.25, Math.min(4, sim2.files/250));
+  const scale=qualityFactor*volumeFactor;
+
+  // A / Greater Cause priority is free. D cannot buy priority. Only eligible B/C expedited
+  // services are used for the indicative direct-pricing revenue model.
+  const bFiles=s2.counts[1], cFiles=s2.counts[2];
+  const priorityRevenue=bFiles*0.015 + cFiles*0.005; // ₹ crore: ₹1.5 lakh/B and ₹0.5 lakh/C proxy
+
+  const interestSavings=1460.82*scale;
+  const productivityValue=570*scale;
+  const economicValue=2030.82*scale;
+  const complianceFiscal=economicValue*0.05*(sim2.fiscal/100);
+  const directGovRevenue=priorityRevenue+complianceFiscal;
+  // Economic Value already comprises financing/delay value + process productivity.
+  // Keep total EoDB economic value as the wider-benefit total to prevent double counting.
+  const widerEconomicBenefit=economicValue;
+  const combinedImpact=directGovRevenue+widerEconomicBenefit;
+  const perFile=sim2.files?combinedImpact/sim2.files:0;
+  return {priorityRevenue,interestSavings,productivityValue,economicValue,complianceFiscal,directGovRevenue,widerEconomicBenefit,combinedImpact,perFile,scale};
+}
+
+function projects(){
+  return [
+    {name:"Airline", activity:"Leased regional aircraft network connecting Chennai–Trichy–Coimbatore–Salem–Madurai and related economic corridors", investment:300, revenue:900, jobs:2500, gva:405, fiscal:72, horizon:"12–24 months", output:"Connectivity, business travel, tourism, cargo/logistics, cluster access"},
+    {name:"Retail", activity:"Tamil Nadu sourcing + organised retail/supply-chain network across major cities and districts", investment:450, revenue:2800, jobs:12000, gva:840, fiscal:168, horizon:"12–36 months", output:"Farmer linkages, sourcing localisation, retail productivity, GST base expansion"},
+    {name:"Weekend Food", activity:"Organised food courts / hawker-centre model across major urban centres", investment:220, revenue:1300, jobs:8000, gva:650, fiscal:65, horizon:"6–18 months", output:"Weekend spending capture, formalisation, tourism and food-service employment"},
+    {name:"Farmstay + Temple Tourism", activity:"50-property farmstay network integrated with temple circuits and rural experiences", investment:250, revenue:750, jobs:3500, gva:413, fiscal:45, horizon:"12–30 months", output:"Rural tourism, agriculture value-add, local employment, heritage activation"},
+    {name:"EOU / Exports", activity:"100 export-oriented units across TN manufacturing and processing clusters", investment:2500, revenue:5000, jobs:30000, gva:2250, fiscal:90, horizon:"24–60 months", output:"Exports, cluster manufacturing, local value addition, trade corridor utilisation"},
+    {name:"GST / Fiscal Revenue", activity:"Compliance, formalisation and incremental taxable activity arising from the programme", investment:200, revenue:2200, jobs:1500, gva:0, fiscal:2200, horizon:"12–60 months", output:"GST/compliance uplift, revenue augmentation, collection efficiency"}
+  ];
+}
+
+
+const cityFocusCountries={
+  "Chennai":["Singapore","United States","Japan","South Korea"],
+  "Coimbatore":["Germany","Japan","United Kingdom","Switzerland"],
+  "Tiruchirappalli":["Germany","Japan","France","United Kingdom"],
+  "Madurai":["Singapore","United Kingdom","UAE","Malaysia"],
+  "Salem":["Japan","South Korea","Germany","United Kingdom"],
+  "Tiruppur":["United Kingdom","Germany","Netherlands","Italy"],
+  "Hosur":["Japan","South Korea","Germany","United States"],
+  "Erode":["United Kingdom","Netherlands","Germany","UAE"],
+  "Vellore":["United Kingdom","Germany","United States","France"],
+  "Thoothukudi":["Singapore","UAE","Netherlands","Japan"],
+  "Tirunelveli":["United Kingdom","Germany","Denmark","Japan"]
+};
+function focusCountriesForCity(){
+  const c=(typeof selectedCity!=="undefined"?selectedCity:(typeof city!=="undefined"?city:"Coimbatore"));
+  return cityFocusCountries[c]||["Germany","Japan","Singapore","United Kingdom"];
+}
+
+function renderTabs(){
+  document.getElementById("tabs").innerHTML=tabs.map(t=>`<button class="tab ${t===active?"active":""}" onclick="active='${t}';renderTabs();render()">${t}</button>`).join("");
+}
+
+function render(){
+  const p=document.getElementById("panel"), s1=calcSim1(), s2=calcSim2(), a=aircraft(), c=cities[selectedCity];
+
+  if(active==="Home"){
+    p.innerHTML=`<div class="brandbar"><div><div class="kicker">WELLINGTON AI • TN-IGS</div><h2>TN Integrated Governance System</h2></div><div class="brand">Wellington AI<small>AI for Sustainable Growth</small></div></div>
+    <div class="note"><b>What this simulator does:</b> TN-IGS connects department portfolio performance, file-level decisions, strategic direction, economic value, city development and investment origination into one Tamil Nadu governance simulation.</div>
+    <div class="introgrid">
+      <div class="introitem"><b>Simulation Engine 1</b>Department portfolio, workload, QUALITY, GREATER CAUSE, VALUE, PLACE and A+B potential.</div>
+      <div class="introitem"><b>Simulation Engine 2</b>File-level public-value scoring, compliance gate, ABCD classification, SLA and lawful priority treatment.</div>
+      <div class="introitem"><b>Aircraft Indicator</b>EU / Singapore strategic direction using altitude, headwind, tailwind, thrust, navigation accuracy and deviation.</div>
+      <div class="introitem"><b>Management Dashboard</b>Turns Simulation 1 + 2 into management meters, direct revenue and wider economic-value outputs.</div>
+      <div class="introitem"><b>Ease of Doing Business</b>Industry approval performance, target gap and the annual economic value released through improvement.</div>
+      <div class="introitem"><b>City Indicator</b>Select one Tamil Nadu city to view cluster, investment, jobs, economic-centre strength and transit direction.</div>
+      <div class="introitem"><b>Sustainability & Liveability</b>Clean water, land access, air quality, traffic flow and planned urban form.</div>
+      <div class="introitem"><b>Development Style & AI</b>EU/Asia reference style plus Transit, Urban, Flood, Trade, Employ and Thames AI views.</div>
+      <div class="introitem"><b>Investment Bridge</b>Uses the selected city, existing mission simulation and automatically suggested focus countries—no country dropdown.</div>
+      <div class="introitem"><b>Benchmarks</b>Analytical India-city and state-industrial comparisons for context, not official rankings.</div>
+      <div class="introitem"><b>Govt Revenue Enhancement</b>Six projects: Airline, Retail, Weekend Food, Farmstay + Temple Tourism, EOU/Exports and GST/Fiscal.</div>
+      <div class="introitem"><b>Data & API Integration</b>Live source feed, monthwise actual snapshots and manual simulations with source/time provenance.</div>
+    </div>`;
+  }
+
+  else if(active==="Simulation Engine 1"){
+    const modeClass=sim1.dataMode==="Live Source Feed"?(integration.connected?"live":"offline"):(sim1.dataMode==="Manual Simulation"?"manual":"live");
+    p.innerHTML=`<div class="kicker">PRIME 1 — ${sim1.dataMode.toUpperCase()} | DATA MONTH ${sim1.dataMonth}</div><h2>Simulation Engine 1 — Department Portfolio Simulation</h2>
+    <div class="controls grid g4">
+      <label>Data Mode<select id="s1mode">
+        <option ${sim1.dataMode==="Monthwise Actual Snapshot"?"selected":""}>Monthwise Actual Snapshot</option>
+        <option ${sim1.dataMode==="Manual Simulation"?"selected":""}>Manual Simulation</option>
+        <option ${sim1.dataMode==="Live Source Feed"?"selected":""}>Live Source Feed</option>
+      </select></label>
+      <label>Data Month / Year<input id="s1month" type="month" value="${sim1.dataMonth}"/></label>
+      <label>Live Source Website / API<input id="s1source" type="text" value="${integration.sourceWebsite}"/></label>
+      <label>Department<select id="s1dept">${optionList(departments,sim1.dept)}</select></label>
+      <label>Number of Files<input id="s1files" type="number" min="1" value="${sim1.files}"/></label>
+      <label>Simulation Period (months)<input id="s1period" type="number" min="1" value="${sim1.period}"/></label>
+      <label>Complexity Factor<input id="s1complexity" type="number" min="0.5" max="2" step="0.1" value="${sim1.complexity}"/></label>
+      <div><div class="label">Source Status</div><div style="margin-top:8px"><span class="status ${modeClass}">${sim1.dataMode==="Live Source Feed"?(integration.connected?"LIVE CONNECTED":"API READY / OFFLINE"):sim1.dataMode}</span></div></div>
+      <div><div class="label">API Refresh</div><button id="s1refresh" class="action" style="margin-top:5px">Refresh Monthwise Actual Snapshot</button></div>
+    </div>
+    <div class="note"><b>Data rule:</b> <b>Live Source Feed</b> retrieves the current value from the configured website/API and records the retrieval timestamp. <b>Monthwise Actual Snapshot</b> replays stored source data for the selected month/year. <b>Manual Simulation</b> allows planning assumptions without altering stored actuals.</div>
+    <div class="grid g5">
+      ${gaugeCard("Portfolio Score",s1.score,100,s1.score.toFixed(1))}
+      ${gaugeCard("A+B Potential",s1.ab,100,s1.ab.toFixed(1)+"%")}
+      ${gaugeCard("File Score",s2.score,100,s2.score.toFixed(1))}
+      ${gaugeCard("Required Thrust",a.thrust,100,a.thrust.toFixed(1))}
+      ${gaugeCard("EoDB",7.68,10,"7.68")}
+    </div>
+    <div class="grid g5" style="margin-top:12px">
+      ${card("Portfolio Score",s1.score.toFixed(1)+"/100")}
+      ${card("A+B Potential",s1.ab.toFixed(1)+"%")}
+      ${card("Monthly Files",s1.monthly.toFixed(1))}
+      ${card("Capacity Utilisation",s1.util.toFixed(1)+"%")}
+      ${card("Performance Units",Math.round(s1.performance).toLocaleString())}
+    </div>
+    <div class="grid g4" style="margin-top:12px">
+      ${card("A Files",s1.A)}
+      ${card("B Files",s1.B)}
+      ${card("C Files",s1.C)}
+      ${card("D Files",s1.D)}
+    </div>
+    ${tbl([
+      ["QUALITY",s1.d.q,"Correct output / no rework"],
+      ["GREATER CAUSE",s1.d.gc,"Public-benefit priority"],
+      ["VALUE",s1.d.val,"Economic + public + intangible value"],
+      ["PLACE",s1.d.place,"Land existence + people preference"]
+    ],["Dimension","Score","Role"])}
+    <div class="note"><b>Performance Unit:</b> Output × Complexity × Timeliness × Quality × Public-Value Factor. Base salary remains protected; variable performance reward follows verified output and quality.</div>`;
+    document.getElementById("s1source").onchange=e=>{integration.sourceWebsite=e.target.value;};
+    document.getElementById("s1mode").onchange=e=>{sim1.dataMode=e.target.value; if(sim1.dataMode==="Live Source Feed") loadActualData(1); else render();};
+    document.getElementById("s1month").onchange=e=>{sim1.dataMonth=e.target.value; if(sim1.dataMode==="Live Source Feed") loadActualData(1); else render();};
+    ["s1dept","s1files","s1period","s1complexity"].forEach(id=>document.getElementById(id).onchange=()=>{
+      sim1.dept=document.getElementById("s1dept").value;
+      sim1.files=+document.getElementById("s1files").value;
+      sim1.period=+document.getElementById("s1period").value;
+      sim1.complexity=+document.getElementById("s1complexity").value;
+      if(sim1.dataMode==="Live Source Feed") loadActualData(1); else render();
+    });
+    document.getElementById("s1refresh").onclick=()=>loadActualData(1);
+  }
+  else if(active==="Simulation Engine 2"){
+    const modeClass=sim2.dataMode==="Live Source Feed"?(integration.connected?"live":"offline"):(sim2.dataMode==="Manual Simulation"?"manual":"live");
+    p.innerHTML=`<div class="kicker">PRIME 2 — ${sim2.dataMode.toUpperCase()} | DATA MONTH ${sim2.dataMonth}</div><h2>Simulation Engine 2 — File-Level Decision Simulation</h2>
+    <div class="controls grid g3">
+      <label>Data Mode<select id="s2mode">
+        <option ${sim2.dataMode==="Monthwise Actual Snapshot"?"selected":""}>Monthwise Actual Snapshot</option>
+        <option ${sim2.dataMode==="Manual Simulation"?"selected":""}>Manual Simulation</option>
+        <option ${sim2.dataMode==="Live Source Feed"?"selected":""}>Live Source Feed</option>
+      </select></label>
+      <label>Data Month / Year<input id="s2month" type="month" value="${sim2.dataMonth}"/></label>
+      <label>Live Source Website / API<input id="s2source" type="text" value="${integration.sourceWebsite}"/></label>
+      <label>Department<select id="s2dept">${optionList(departments,sim2.dept)}</select></label>
+      <label>Number of Files<input id="s2files" type="number" min="1" value="${sim2.files}"/></label>
+      <label>Compliance<input id="s2compliance" type="number" min="0" max="100" value="${sim2.compliance}"/></label>
+      <label>Greater Cause<input id="s2gc" type="number" min="0" max="100" value="${sim2.gc}"/></label>
+      <label>Economic Output<input id="s2eco" type="number" min="0" max="100" value="${sim2.eco}"/></label>
+      <label>PLACE<input id="s2place" type="number" min="0" max="100" value="${sim2.place}"/></label>
+      <label>Quality<input id="s2quality" type="number" min="0" max="100" value="${sim2.quality}"/></label>
+      <label>Employment<input id="s2jobs" type="number" min="0" max="100" value="${sim2.jobs}"/></label>
+      <label>Strategic / Resilience<input id="s2strategic" type="number" min="0" max="100" value="${sim2.strategic}"/></label>
+      <label>Goodwill / Brand<input id="s2brand" type="number" min="0" max="100" value="${sim2.brand}"/></label>
+      <label>Fiscal Benefit<input id="s2fiscal" type="number" min="0" max="100" value="${sim2.fiscal}"/></label>
+      <div><div class="label">Source Status</div><div style="margin-top:8px"><span class="status ${modeClass}">${sim2.dataMode==="Live Source Feed"?(integration.connected?"LIVE CONNECTED":"API READY / OFFLINE"):sim2.dataMode}</span></div></div>
+      <div><div class="label">API Refresh</div><button id="s2refresh" class="action" style="margin-top:5px">Refresh Monthwise Actual Snapshot</button></div>
+    </div>
+    <div class="note"><b>Data rule:</b> Live mode is a point-in-time source retrieval. Monthwise mode uses archived source snapshots for the chosen month/year. Manual mode keeps all fields editable for simulation and policy testing.</div>
+    <div class="grid g5">
+      ${card("Representative Class",s2.cls)}
+      ${card("Average Public Value",s2.score.toFixed(1)+"/100")}
+      ${card("Rework / D-risk Files",s2.rework)}
+      ${card("Department",sim2.dept)}
+      ${card("Files Simulated",sim2.files)}
+    </div>
+    <div class="grid g4" style="margin-top:12px">
+      ${card("A Files",s2.counts[0])}${card("B Files",s2.counts[1])}${card("C Files",s2.counts[2])}${card("D Files",s2.counts[3])}
+    </div>
+    ${tbl([
+      ["Greater Cause / Public Benefit","20%"],["Economic Output","15%"],["PLACE","15%"],
+      ["Quality / Compliance","15%"],["Employment","10%"],["Strategic / Resilience","10%"],
+      ["Goodwill / Brand","10%"],["Fiscal Benefit","5%"]
+    ],["Dimension","Weight"])}
+    <div class="note"><b>Compliance is a gate.</b> Money must never move a D file ahead of A/B/C. Greater Cause may override monetisation where public benefit justifies it.</div>`;
+    document.getElementById("s2source").onchange=e=>{integration.sourceWebsite=e.target.value;};
+    document.getElementById("s2mode").onchange=e=>{sim2.dataMode=e.target.value; if(sim2.dataMode==="Live Source Feed") loadActualData(2); else render();};
+    document.getElementById("s2month").onchange=e=>{sim2.dataMonth=e.target.value; if(sim2.dataMode==="Live Source Feed") loadActualData(2); else render();};
+    ["dept","files","compliance","gc","eco","place","quality","jobs","strategic","brand","fiscal"].forEach(k=>{
+      document.getElementById("s2"+k).onchange=()=>{
+        sim2.dept=document.getElementById("s2dept").value;
+        sim2.files=+document.getElementById("s2files").value;
+        ["compliance","gc","eco","place","quality","jobs","strategic","brand","fiscal"].forEach(x=>sim2[x]=+document.getElementById("s2"+x).value);
+        if(sim2.dataMode==="Live Source Feed") loadActualData(2); else render();
+      };
+    });
+    document.getElementById("s2refresh").onclick=()=>loadActualData(2);
+  }
+  else if(active==="Aircraft Indicator"){
+    p.innerHTML=`<div class="kicker">PRIME 3 — STRATEGIC FLIGHT PATH</div><h2>Aircraft Indicator — EU / Singapore Direction & Thrust Engine</h2>
+    <div class="grid g2">
+      <div class="aircraft-visual">
+        <div class="route eu"></div><div class="route sg"></div>
+        <div class="route-label eu-label">NORTH — EU<br><span style="font-weight:400">Rule quality • standards • institutional design</span></div>
+        <div class="route-label sg-label">SOUTH — SINGAPORE<br><span style="font-weight:400">Execution • SLA • approval speed</span></div>
+        <div class="plane">✈️</div>
+        <div class="flight-copy"><b>Current Direction: ${a.direction}</b><br>${a.status} • The aircraft metaphor converts system constraints into a management intervention signal.</div>
+      </div>
+      <div class="grid g2">
+        ${gaugeCard("Altitude / Maturity",a.altitude,100,a.altitude.toFixed(1))}
+        ${gaugeCard("Headwind",a.headwind,100,a.headwind.toFixed(1))}
+        ${gaugeCard("Tailwind",a.tailwind,100,a.tailwind.toFixed(1))}
+        ${gaugeCard("Required Thrust",a.thrust,100,a.thrust.toFixed(1))}
+        ${gaugeCard("Navigation Accuracy",a.nav,100,a.nav.toFixed(1))}
+        ${gaugeCard("Flight-path Deviation",a.deviation,20,a.deviation.toFixed(1))}
+      </div>
+    </div>
+    <div class="grid g4" style="margin-top:12px">
+      ${card("Direction",a.direction)}
+      ${card("Status",a.status)}
+      ${card("EU Trigger","QUALITY < VALUE − 3")}
+      ${card("Singapore Trigger","EoDB < 8 or approval days > 1.4× target")}
+    </div>
+    <div class="note"><b>Approved logic retained:</b> NORTH — EU when rule/institutional quality materially trails value potential; SOUTH — SINGAPORE when business-facing execution, SLA or approval speed is the larger constraint; TRANSIT / HYBRID otherwise.</div>`;
+  }
+  else if(active==="Management Dashboard"){
+    const m=managementImpact();
+    p.innerHTML=`<div class="kicker">PRIME 4 — RESULTS OF SIMULATION ENGINE 1 + 2 | S1 ${sim1.dataMonth} | S2 ${sim2.dataMonth}</div><h2>Management Dashboard</h2>
+    <div class="grid g5">
+      ${card("Portfolio Score",s1.score.toFixed(1)+"/100","Simulation Engine 1")}
+      ${card("A+B Potential",s1.ab.toFixed(1)+"%","Simulation Engine 1")}
+      ${card("File Class",s2.cls+" / "+s2.score.toFixed(1),"Simulation Engine 2")}
+      ${card("Files Simulated",sim2.files.toLocaleString(),sim2.dept)}
+      ${card("Direction",a.direction,"Aircraft Indicator")}
+    </div>
+
+    <h2 style="margin-top:20px">Financial & Economic Result</h2>
+    <div class="grid g4">
+      ${card("Priority-pricing Revenue Potential",cr(m.priorityRevenue),"Direct government revenue proxy")}
+      ${card("Interest / Delay Savings",cr(m.interestSavings),"Projects/business financing benefit")}
+      ${card("Economic Value Add",cr(m.economicValue),"Annual economic value released")}
+      ${card("Process Productivity Value",cr(m.productivityValue),"Administrative/business productivity")}
+      ${card("Compliance / Fiscal Uplift",cr(m.complianceFiscal),"Indicative fiscal proxy")}
+      ${card("Direct Government Revenue",cr(m.directGovRevenue),"Priority pricing + fiscal uplift")}
+      ${card("Wider Economic Benefit",cr(m.widerEconomicBenefit),"Total EoDB economic value; components not re-added")}
+      ${card("Combined Annual Impact",cr(m.combinedImpact),"Do not treat all components as tax revenue")}
+    </div>
+
+    <h2 style="margin-top:20px">ABCD Result & Revenue Eligibility</h2>
+    ${tbl([
+      ["A — Greater Cause",s2.counts[0].toLocaleString(),"Free / highest legitimate public-benefit priority","No paid priority"],
+      ["B — High-value",s2.counts[1].toLocaleString(),"Eligible for lawful expedited service","Indicative ₹1.5 lakh/file pricing proxy"],
+      ["C — Standard compliant",s2.counts[2].toLocaleString(),"Standard SLA; optional lawful expedite","Indicative ₹0.5 lakh/file pricing proxy"],
+      ["D — Deficient/non-compliant",s2.counts[3].toLocaleString(),"Correct / rework / reject","Cannot buy priority"]
+    ],["Class","Files","Treatment","Priority-pricing Rule"])}
+
+    <h2 style="margin-top:20px">Executive Interpretation</h2>
+    ${tbl([
+      ["System performance",s1.score.toFixed(1)+"/100; "+s1.ab.toFixed(1)+"% A+B","Simulation 1"],
+      ["File decision quality",s2.score.toFixed(1)+"/100; class "+s2.cls,"Simulation 2"],
+      ["Priority-pricing revenue",cr(m.priorityRevenue),"Simulation 2 B/C eligible file population"],
+      ["Interest / delay saving",cr(m.interestSavings),"Simulation 1+2 quality and file-volume scaling"],
+      ["Economic value add",cr(m.economicValue),"Simulation 1+2 economic/public-value result"],
+      ["Productivity value",cr(m.productivityValue),"Workload + decision quality result"],
+      ["Direct government revenue",cr(m.directGovRevenue),"Priority pricing + fiscal/compliance proxy"],
+      ["Combined annual impact",cr(m.combinedImpact),"Direct fiscal + wider economic benefit"],
+      ["Strategic direction",a.direction+" / "+a.status,"Aircraft Indicator"]
+    ],["Management Result","Value","Source / Logic"])}
+    <div class="note"><b>Dashboard rule:</b> these values are calculated outputs from Simulation Engine 1 and Simulation Engine 2. Priority pricing is an illustrative lawful-service model, not a charge on Greater Cause/A files. Wider economic benefit is kept separate from direct government revenue to avoid double counting.</div>`;
+  }
+
+  else if(active==="Ease of Doing Business"){
+    p.innerHTML=`<h2>Ease of Doing Business (EoDB) — Industry Dashboard</h2>
+    <div class="grid g5">${card("Current","7.68/10")}${card("Target","9.27/10")}${card("Gap","+1.59")}${card("Approval Days","28.9")}${card("Target Approval","15.2")}</div>
+    ${tbl(industries.map(x=>[x[0],x[1].toFixed(1),x[2].toFixed(1),"+"+(x[2]-x[1]).toFixed(1)]),["Industry","Current","Target","Gap"])}`;
+  }
+
+  else if(active==="Ease of Doing Business Economic Value"){
+    p.innerHTML=`<h2>Ease of Doing Business (EoDB) — Economic Value Dashboard</h2>
+    <div class="grid g4">${card("Annual Economic Value","₹2,030.82 cr")}${card("Financing / Delay","₹1,460.82 cr")}${card("Process Productivity","₹570 cr")}${card("Highest-value Industry","Electronics & Semiconductor")}</div>
+    ${tbl(industries.map(x=>[x[0],cr(x[3])]),["Industry","Annual Value Improvement"])}`;
+  }
+
+  else if(active==="City Indicator"){
+    p.innerHTML=`<h2>City Indicator — Detailed City Simulation</h2>
+    <div class="controls" style="max-width:440px"><label>City Selector<select id="citySelect">${optionList(cities,selectedCity)}</select></label></div>
+    <div class="grid g4">
+      ${card("City",selectedCity)}${card("Tier","Tier "+c.tier)}${card("Primary Cluster",c.cluster)}${card("Cluster Strength",c.cur.toFixed(1)+" → "+c.target.toFixed(1))}
+      ${card("Investment Potential","$"+c.inv.toFixed(1)+"B")}${card("Jobs",c.jobs.toLocaleString())}${card("Economic Centre",c.econ.toFixed(1)+"/10")}${card("Transit",c.transit)}
+    </div>
+    ${tbl(Object.entries(cities).map(([n,x])=>[n,"Tier "+x.tier,x.cluster,"$"+x.inv.toFixed(1)+"B",x.jobs.toLocaleString()]),["City","Tier","Cluster","Investment","Jobs"])}`;
+    document.getElementById("citySelect").onchange=e=>{selectedCity=e.target.value;render()};
+  }
+
+  else if(active==="Sustainability & Liveability"){
+    const cur=.25*c.s[0]+.20*c.s[1]+.25*c.s[2]+.20*c.s[3]+.10*c.s[4];
+    const tar=.25*c.t[0]+.20*c.t[1]+.25*c.t[2]+.20*c.t[3]+.10*c.t[4];
+    p.innerHTML=`<h2>Sustainability & Liveability — ${selectedCity}</h2>
+    <div class="grid g5">${card("Clean Water",c.s[0]+" → "+c.t[0])}${card("Land Access",c.s[1]+" → "+c.t[1])}${card("Air Quality",c.s[2]+" → "+c.t[2])}${card("Traffic Flow",c.s[3]+" → "+c.t[3])}${card("Skyline / Urban Form",c.s[4]+" → "+c.t[4])}</div>
+    <div class="grid g4" style="margin-top:12px">${card("Current Sustainability",cur.toFixed(1)+"/100")}${card("Target Sustainability",tar.toFixed(1)+"/100")}${card("Liveability Formula","60% Sust. + 20% Governance + 20% Economy")}${card("City",selectedCity)}</div>`;
+  }
+
+  else if(active==="Development Style & AI"){
+    const ai=[Math.round(70*c.cur+10*c.econ+20*(c.s[3]/10))/10,88,82,86,88,84];
+    p.innerHTML=`<h2>Development Style & AI — ${selectedCity}</h2>
+    <div class="grid g4">${card("City",selectedCity)}${card("Tier","Tier "+c.tier)}${card("Development Style",c.style)}${card("Transit Recommendation",c.transit)}</div>
+    <div class="grid g3" style="margin-top:12px">${card("Transit AI",ai[0]+"/100")}${card("Urban AI",ai[1]+"/100")}${card("Flood AI",ai[2]+"/100")}${card("Trade AI",ai[3]+"/100")}${card("Employ AI",ai[4]+"/100")}${card("Thames AI",ai[5]+"/100")}</div>
+    <div class="note"><b>Transit rule:</b> Tier 1 = metro + suburban/regional rail. Tier 2 = tram/light rail/BRT according to demand and urban form. Tier 3 = infrastructure-led using road width, ROW, demand, junction constraints, existing connectivity and growth.</div>`;
+  }
+
+  else if(active==="Investment Bridge"){
+    const focus=focusCountriesForCity();
+    p.innerHTML=`<div class="kicker">INVESTMENT ORIGINATION — ${selectedCity.toUpperCase()}</div><h2>Investment Bridge Simulation</h2>
+    <div class="grid g4">
+      ${card("Selected City",selectedCity)}
+      ${card("Base Potential","$"+c.inv.toFixed(1)+"B")}
+      ${card("Jobs Potential",c.jobs.toLocaleString())}
+      ${card("Primary Cluster",c.cluster)}
+    </div>
+    <h2 style="margin-top:18px">Country Focus for ${selectedCity}</h2>
+    <div class="card">${focus.map(x=>`<span class="country-chip">${x}</span>`).join("")}<div class="small" style="margin-top:8px">Automatically suggested from the city's industry cluster, technology, export/trade profile and investment fit. No country selector is used.</div></div>
+    <h2 style="margin-top:18px">Existing Mission Simulation</h2>
+    <div class="grid g3">
+      ${card("Focused Mission","60 screened → 18 meetings → 6 decision table","12% conversion • 30% activation")}
+      ${card("Major Mission","120 screened → 30 meetings → 12 decision table","20% conversion • 50% activation")}
+      ${card("Strategic Mission","200 screened → 45 meetings → 20 decision table","30% conversion • 70% activation")}
+    </div>
+    <div class="note"><b>Pipeline:</b> Introduced → Qualified → Decision Table → LOI/MoU → Site Selection → Funding Confirmed → Government Approval → Financial Close → Construction → Operating Investment. Pipeline is not treated as secured investment prematurely.</div>`;
+  }
+  else if(active==="India City Benchmark"){
+    p.innerHTML=`<h2>India City Benchmark</h2><div class="grid g5">${card("Bengaluru","9.485")}${card("Mumbai","9.460")}${card("Chennai","9.275")}${card("Pune","9.060")}${card("Coimbatore","8.360")}</div><div class="note">Analytical competitiveness benchmark; not an official government ranking.</div>`;
+  }
+
+  else if(active==="State Industrial Benchmark"){
+    p.innerHTML=`<h2>State Industrial Benchmark</h2><div class="grid g4">${card("Maharashtra","8.41 — Rank 1")}${card("Gujarat","7.47 — Rank 2")}${card("Tamil Nadu","7.39 — Rank 3")}${card("Karnataka","7.36 — Rank 4")}</div><div class="note">Analytical weighting: 15% FDI + 25% exports + 10% export growth + 35% cluster breadth + 15% facilitation.</div>`;
+  }
+
+  else if(active==="Govt Revenue Enhancement"){
+    const ps=projects();
+    const totalRevenue=ps.reduce((a,x)=>a+x.revenue,0), totalInv=ps.reduce((a,x)=>a+x.investment,0), totalJobs=ps.reduce((a,x)=>a+x.jobs,0), totalGva=ps.reduce((a,x)=>a+x.gva,0), totalFiscal=ps.reduce((a,x)=>a+x.fiscal,0);
+    p.innerHTML=`<h2>Government Revenue Enhancement — Six Detailed Projects</h2>
+    <div class="grid g5">
+      ${card("Programme Investment",cr(totalInv))}
+      ${card("Annual Activity / Revenue",cr(totalRevenue))}
+      ${card("Jobs",totalJobs.toLocaleString())}
+      ${card("Indicative GVA",cr(totalGva))}
+      ${card("Fiscal / GST Effect",cr(totalFiscal))}
+    </div>
+    <div class="note"><b>Important:</b> project revenue/economic activity, wider GVA and direct fiscal revenue are shown separately to avoid double counting.</div>
+    ${ps.map(x=>`<div class="project">
+      <h3>${x.name}</h3>
+      <div class="grid g4">
+        ${card("Programme Activity",x.activity)}
+        ${card("Indicative Investment",cr(x.investment))}
+        ${card("Annual Activity / Revenue",cr(x.revenue))}
+        ${card("Implementation Horizon",x.horizon)}
+        ${card("Jobs",x.jobs.toLocaleString())}
+        ${card("Indicative GVA",cr(x.gva))}
+        ${card("Fiscal / GST Effect",cr(x.fiscal))}
+        ${card("Key Output",x.output)}
+      </div>
+    </div>`).join("")}
+    ${tbl(ps.map(x=>[
+      x.name,cr(x.investment),cr(x.revenue),x.jobs.toLocaleString(),cr(x.gva),cr(x.fiscal),x.horizon
+    ]),["Project","Investment","Annual Activity","Jobs","GVA","Fiscal/GST","Horizon"])}`;
+  }
+  else if(active==="Data & API Integration"){
+    p.innerHTML=`<div class="kicker">REAL-TIME BACKEND PROVISION</div><h2>Data, Database & API Integration</h2>
+    <div class="grid g4">
+      ${card("API Base",integration.apiBase)}
+      ${card("Connection",integration.connected?"Connected":"Provisioned / Offline")}
+      ${card("Last Refresh",integration.lastRefresh)}
+      ${card("Current Source",integration.source)}
+      ${card("Source Website / API",integration.sourceWebsite)}
+      ${card("Point-in-time Retrieved",integration.sourceTimestamp)}
+    </div>
+
+    <div class="controls grid g2">
+      <label>Backend API Base URL<input id="apiBase" type="url" value="${integration.apiBase}"/></label>
+      <div><div class="label">Connection Test</div><button id="testApi" class="action" style="margin-top:5px">Test /health</button></div>
+    </div>
+
+    <h2 style="margin-top:20px">Production Data Flow</h2>
+    ${tbl([
+      ["1","Department workflow / e-office / ERP / project systems","Raw file, SLA, approval, project and financial data"],
+      ["2","Integration API / ETL","Validation, authentication, field mapping, duplicate checks"],
+      ["3","Operational database","Month/year snapshots + transaction-level records"],
+      ["4","Simulation Engine 1","Department portfolio, workload, ABCD potential, performance"],
+      ["5","Simulation Engine 2","File-level scoring, compliance gate, ABCD, SLA/authority"],
+      ["6","Aircraft + Management Dashboard","Direction, thrust, priority-pricing potential, interest savings, economic value"],
+      ["7","Ease of Doing Business / city / project tabs","Downstream policy and economic views"]
+    ],["Layer","Component","Function"])}
+
+    <h2 style="margin-top:20px">Provisioned API Contract</h2>
+    ${tbl([
+      ["GET /api/v1/simulation1","department, month","Actual portfolio inputs for Simulation 1"],
+      ["GET /api/v1/simulation2","department, month","Actual file-level aggregate inputs for Simulation 2"],
+      ["GET /api/v1/management","department, month","Precomputed dashboard result if desired"],
+      ["POST /api/v1/events/files","JSON event","Optional near-real-time file/workflow event ingestion"],
+      ["GET /health","—","Service/database health"]
+    ],["Endpoint","Parameters","Purpose"])}
+
+    <div class="note"><b>Security provision:</b> production deployment should use HTTPS, government SSO/OAuth2 or signed service tokens, role-based access, audit logging, encryption at rest, API rate limits, and database read-only service accounts for source systems. Personal/sensitive data should be minimised or aggregated before dashboard use.</div>
+    <div class="note"><b>Real-time model:</b> the present HTML works standalone. In <b>Live Source Feed</b>, the backend retrieves the current source value and stores the retrieval timestamp. In <b>Monthwise Actual Snapshot</b>, the system queries an archived snapshot by month/year. In <b>Manual Simulation</b>, inputs remain editable. All three modes feed the same approved Simulation 1 → Simulation 2 → Aircraft → Management calculation chain.</div>`;
+    document.getElementById("apiBase").onchange=e=>{integration.apiBase=e.target.value.replace(/\/$/,"");render();};
+    document.getElementById("testApi").onclick=async()=>{
+      try{
+        const r=await fetch(integration.apiBase.replace(/\/api\/v1$/,"")+"/health");
+        if(!r.ok) throw new Error("HTTP "+r.status);
+        integration.connected=true; integration.lastRefresh=new Date().toLocaleString(); integration.source="Live source API / database"; integration.sourceTimestamp=new Date().toISOString();
+      }catch(e){
+        integration.connected=false; integration.lastRefresh="Connection failed: "+e.message; integration.source="Local fallback dataset"; integration.sourceTimestamp="Connection failed";
+      }
+      render();
+    };
+  }
+}
+
+renderTabs(); render();
+</script>
+
+<script>
+(function(){
+  const KEY='tnigs_visitor_id_v1';
+  let visitorId;
+  try{
+    visitorId=localStorage.getItem(KEY);
+    if(!visitorId){visitorId='v_'+crypto.getRandomValues(new Uint32Array(4)).join('_');localStorage.setItem(KEY,visitorId);}
+  }catch(e){visitorId='v_session_'+Math.random().toString(36).slice(2);}
+  const qs=new URLSearchParams(location.search);
+  const payload={
+    event:'page_view',
+    visitorId,
+    recipientToken:(qs.get('rid')||'').slice(0,80),
+    source:(qs.get('src')||'direct').slice(0,80),
+    campaign:(qs.get('campaign')||'').slice(0,80),
+    path:location.pathname,
+    referrer:(document.referrer?new URL(document.referrer).hostname:'direct'),
+    ts:new Date().toISOString()
+  };
+  try{navigator.sendBeacon('/api/track',new Blob([JSON.stringify(payload)],{type:'application/json'}));}
+  catch(e){fetch('/api/track',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),keepalive:true}).catch(()=>{});}
+  window.tnigsTrack=function(event,detail={}){
+    const data={...payload,event:String(event).slice(0,80),detail,ts:new Date().toISOString()};
+    fetch('/api/track',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data),keepalive:true}).catch(()=>{});
+  };
+  const originalRender=window.render;
+  if(typeof originalRender==='function'){window.render=function(){const r=originalRender.apply(this,arguments);try{window.tnigsTrack('tab_view',{tab:window.active||''});}catch(e){}return r;};}
+})();
+</script>
+
+</body>
+</html>
