@@ -123,6 +123,8 @@ const cities={
 "Tirunelveli":{tier:3,cluster:"Renewable Energy + Electronics/Agro",cur:7.2,target:8.8,inv:1.1,jobs:24000,econ:7.1,style:"Green regional centre",transit:"Regional rail/e-bus/BRT",s:[75,80,72,68,58],t:[93,93,90,87,82]}
 };
 
+const cityAIRatingBaseline={"Chennai":{"core":{"HydelAI":48,"TransitAI":91,"TradeAI":94,"UrbanAI":73,"ThamesAI":69,"PlantationAI":55,"AirlineAI":96},"region":{"HydelAI":54,"TransitAI":80,"TradeAI":94,"UrbanAI":67,"ThamesAI":66,"PlantationAI":58,"AirlineAI":91}},"Coimbatore":{"core":{"HydelAI":83,"TransitAI":78,"TradeAI":87,"UrbanAI":80,"ThamesAI":77,"PlantationAI":86,"AirlineAI":84},"region":{"HydelAI":91,"TransitAI":66,"TradeAI":85,"UrbanAI":73,"ThamesAI":82,"PlantationAI":91,"AirlineAI":73}},"Tiruchirappalli":{"core":{"HydelAI":69,"TransitAI":73,"TradeAI":78,"UrbanAI":76,"ThamesAI":75,"PlantationAI":72,"AirlineAI":76},"region":{"HydelAI":76,"TransitAI":67,"TradeAI":75,"UrbanAI":72,"ThamesAI":78,"PlantationAI":80,"AirlineAI":66}},"Madurai":{"core":{"HydelAI":53,"TransitAI":71,"TradeAI":72,"UrbanAI":72,"ThamesAI":69,"PlantationAI":75,"AirlineAI":79},"region":{"HydelAI":62,"TransitAI":62,"TradeAI":70,"UrbanAI":68,"ThamesAI":73,"PlantationAI":82,"AirlineAI":67}},"Salem":{"core":{"HydelAI":88,"TransitAI":68,"TradeAI":76,"UrbanAI":71,"ThamesAI":77,"PlantationAI":73,"AirlineAI":62},"region":{"HydelAI":92,"TransitAI":66,"TradeAI":79,"UrbanAI":68,"ThamesAI":81,"PlantationAI":77,"AirlineAI":65}},"Tiruppur":{"core":{"HydelAI":60,"TransitAI":68,"TradeAI":95,"UrbanAI":65,"ThamesAI":63,"PlantationAI":72,"AirlineAI":58},"region":{"HydelAI":70,"TransitAI":65,"TradeAI":91,"UrbanAI":62,"ThamesAI":69,"PlantationAI":81,"AirlineAI":62}},"Hosur":{"core":{"HydelAI":49,"TransitAI":77,"TradeAI":88,"UrbanAI":71,"ThamesAI":65,"PlantationAI":62,"AirlineAI":69},"region":{"HydelAI":54,"TransitAI":79,"TradeAI":84,"UrbanAI":67,"ThamesAI":70,"PlantationAI":73,"AirlineAI":73}},"Erode":{"core":{"HydelAI":77,"TransitAI":65,"TradeAI":83,"UrbanAI":70,"ThamesAI":77,"PlantationAI":89,"AirlineAI":56},"region":{"HydelAI":82,"TransitAI":62,"TradeAI":80,"UrbanAI":67,"ThamesAI":82,"PlantationAI":92,"AirlineAI":61}},"Vellore":{"core":{"HydelAI":55,"TransitAI":65,"TradeAI":78,"UrbanAI":71,"ThamesAI":70,"PlantationAI":65,"AirlineAI":61},"region":{"HydelAI":61,"TransitAI":67,"TradeAI":82,"UrbanAI":68,"ThamesAI":74,"PlantationAI":72,"AirlineAI":65}},"Thoothukudi":{"core":{"HydelAI":47,"TransitAI":71,"TradeAI":96,"UrbanAI":69,"ThamesAI":74,"PlantationAI":65,"AirlineAI":84},"region":{"HydelAI":52,"TransitAI":68,"TradeAI":91,"UrbanAI":66,"ThamesAI":78,"PlantationAI":73,"AirlineAI":73}},"Tirunelveli":{"core":{"HydelAI":87,"TransitAI":65,"TradeAI":75,"UrbanAI":72,"ThamesAI":82,"PlantationAI":89,"AirlineAI":57},"region":{"HydelAI":92,"TransitAI":62,"TradeAI":72,"UrbanAI":68,"ThamesAI":86,"PlantationAI":92,"AirlineAI":61}}};
+
 let active="Home";
 let selectedCity="Coimbatore";
 let focusCountry="Germany";
@@ -498,7 +500,7 @@ function render(){
       ${card("Investment Potential","$"+c.inv.toFixed(1)+"B")}${card("Jobs",c.jobs.toLocaleString())}${card("Economic Centre",c.econ.toFixed(1)+"/10")}${card("Transit",c.transit)}
     </div>
     ${tbl(Object.entries(cities).map(([n,x])=>[n,"Tier "+x.tier,x.cluster,"$"+x.inv.toFixed(1)+"B",x.jobs.toLocaleString()]),["City","Tier","Cluster","Investment","Jobs"])}
-    <div class="note">Explore confidence-adjusted AI suitability factors and evidence requirements for the selected city.</div><a class="route-link" href="/city-ai-rating.html">Open City AI Rating</a>`;
+    <div class="note">Enter city-specific evidence and regional catchment ratings for the selected city. N/A indicates no verified score has been saved.</div><a class="route-link" href="/city-ai-rating.html">Open City &amp; Regional AI Ratings</a><a class="route-link" href="/roadmap-2036.html">Open 2036 Investment Roadmap</a>`;
     document.getElementById("citySelect").onchange=e=>{selectedCity=e.target.value;render()};
   }
 
@@ -511,21 +513,32 @@ function render(){
   }
 
   else if(active==="Development Style & AI"){
+    const modelDetails=[
+      {name:"TradeAI",factors:"Export demand, industrial capacity and logistics",evidence:"District exports, industry and logistics records"},
+      {name:"ThamesAI",factors:"River exposure, catchment rainfall and flood-defence need",evidence:"River gauges, hydrology and flood maps"},
+      {name:"UrbanAI",factors:"Urban rainfall, drainage and pumping requirements",evidence:"Drainage inventory, rainfall and pumping data"},
+      {name:"TransitAI",factors:"Passenger demand, corridor density and connectivity",evidence:"Origin–destination, road-width and transport studies"},
+      {name:"PlantationAI",factors:"Suitable land, carbon potential and environmental fit",evidence:"Land-use, agronomy, ecology and permissions"},
+      {name:"HydelAI",factors:"Hydel assets, catchment proximity and grid readiness",evidence:"Asset register, catchment and grid data"},
+      {name:"AirlineAI",factors:"Passenger demand, airport access and route economics",evidence:"Airport catchment, route demand and operating evidence"}
+    ];
+    let storedRatings={};
+    try{const parsedRatings=JSON.parse(localStorage.getItem(`tnigs_city_actuals_v2_${selectedCity}`)||"{}");if(parsedRatings&&typeof parsedRatings==="object")storedRatings=parsedRatings}catch{}
+    const baseline=cityAIRatingBaseline[selectedCity];
+    const ratingRows=modelDetails.map(({name,factors,evidence})=>{
+      const core=baseline.core[name],regional=baseline.region[name],combined=Math.round(core*.7+regional*.3);
+      const entry=storedRatings[name],raw=entry?.actual,score=Number(raw);
+      const hasEvidence=raw!==null&&raw!==undefined&&String(raw).trim()!==""&&Number.isFinite(score)&&String(entry?.source||"").trim()!=="";
+      const recorded=hasEvidence?`${Math.round(Math.max(0,Math.min(100,score)))}/100`:'<span class="muted">None recorded</span>';
+      return [name,`${combined}/100`,`${core}/100 · ${regional}/100`,recorded,factors,evidence];
+    });
     p.innerHTML=`<h2>Development Style & AI — ${selectedCity}</h2>
     <div class="grid g4">${card("City",selectedCity)}${card("Tier","Tier "+c.tier)}${card("Development Style",c.style)}${card("Transit Recommendation",c.transit)}</div>
-    <h3 style="margin:18px 0 6px">Seven-model city AI suitability scorecard</h3>
-    <p class="sub">The updated scorecard separates river-flood intelligence from urban drainage and evaluates city/catchment potential across seven distinct AI models.</p>
-    ${tbl([
-      ["TradeAI","Export demand, industrial capacity and logistics","District exports, industry and logistics records"],
-      ["ThamesAI","River exposure, catchment rainfall and flood-defence need","River gauges, hydrology and flood maps"],
-      ["UrbanAI","Urban rainfall, drainage and pumping requirements","Drainage inventory, rainfall and pumping data"],
-      ["TransitAI","Passenger demand, corridor density and connectivity","Origin–destination, road-width and transport studies"],
-      ["PlantationAI","Suitable land, carbon potential and environmental fit","Land-use, agronomy, ecology and permissions"],
-      ["HydelAI","Hydel assets, catchment proximity and grid readiness","Asset register, catchment and grid data"],
-      ["AirlineAI","Passenger demand, airport access and route economics","Airport catchment, route demand and operating evidence"]
-    ],["AI model","City suitability factors","Evidence required"])}
-    <div class="note"><b>Scoring safeguards:</b> scores are illustrative planning scenarios until verified city evidence is entered. AirlineAI uses city/catchment access (not just an airport inside city limits); PlantationAI and HydelAI depend on permissions and feasible assets. FloodAI is not a separate model—river flood risk is ThamesAI, while urban drainage remains UrbanAI.</div>
-    <a class="route-link" href="/city-ai-rating.html">Open the interactive scorecard and enter evidence</a>
+    <h3 style="margin:18px 0 6px">Seven-model city AI ratings</h3>
+    <p class="sub">Research-informed city and regional baseline scores for ${selectedCity}. Combined score = 70% city core + 30% regional catchment. These comparative estimates are not official measured performance; recorded inputs appear separately.</p>
+    ${tbl(ratingRows,["AI model","Baseline /100","Core · regional","Recorded input /100","City suitability factors","Evidence required"])}
+    <div class="note"><b>Rating safeguards:</b> Baselines are comparative research-informed proxies, not official actuals or generated live measurements. A recorded input is shown separately only when its evidence reference is present. AirlineAI uses city/catchment access (not just an airport inside city limits); PlantationAI and HydelAI depend on permissions and feasible assets. No separate Flood AI: river-flood risk is ThamesAI; urban drainage remains UrbanAI.</div>
+    <a class="route-link" href="/city-ai-rating.html">Open detailed city ratings and scenario editor</a>
     <div class="note"><b>Transit rule:</b> Tier 1 = metro + suburban/regional rail. Tier 2 = tram/light rail/BRT according to demand and urban form. Tier 3 = infrastructure-led using road width, ROW, demand, junction constraints, existing connectivity and growth.</div>`;
   }
 
