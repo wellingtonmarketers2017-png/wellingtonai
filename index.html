@@ -38,6 +38,7 @@ table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
 th,td{text-align:left;padding:9px;border-bottom:1px solid var(--line);vertical-align:top}
 th{font-size:12px;color:var(--muted)}
 .note{margin-top:12px;background:#fafbfc;border-radius:10px;padding:12px;font-size:13px;color:#344054}
+.route-link{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:9px 12px;border:1px solid #aac5f3;border-radius:9px;background:var(--soft);color:var(--accent);font-weight:700;text-decoration:none}.route-link:hover{background:#e2edff}.route-link:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .project{border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:12px;background:#fff}
 .project h3{margin:0 0 8px;font-size:16px}
 .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;font-weight:700}
@@ -283,7 +284,7 @@ function render(){
       <div class="introitem"><b>Ease of Doing Business</b>Industry approval performance, target gap and the annual economic value released through improvement.</div>
       <div class="introitem"><b>City Indicator</b>Select one Tamil Nadu city to view cluster, investment, jobs, economic-centre strength and transit direction.</div>
       <div class="introitem"><b>Sustainability & Liveability</b>Clean water, land access, air quality, traffic flow and planned urban form.</div>
-      <div class="introitem"><b>Development Style & AI</b>EU/Asia reference style plus Transit, Urban, Flood, Trade, Employ and Thames AI views.</div>
+      <div class="introitem"><b>Development Style & AI</b>EU/Asia references and evidence-calibrated Transit, Urban, Trade, Thames, Plantation, Hydel and Airline AI city models.</div>
       <div class="introitem"><b>Investment Bridge</b>Uses the selected city, existing mission simulation and automatically suggested focus countries—no country dropdown.</div>
       <div class="introitem"><b>Benchmarks</b>Analytical India-city and state-industrial comparisons for context, not official rankings.</div>
       <div class="introitem"><b>Govt Revenue Enhancement</b>Six projects: Airline, Retail, Weekend Food, Farmstay + Temple Tourism, EOU/Exports and GST/Fiscal.</div>
@@ -496,7 +497,8 @@ function render(){
       ${card("City",selectedCity)}${card("Tier","Tier "+c.tier)}${card("Primary Cluster",c.cluster)}${card("Cluster Strength",c.cur.toFixed(1)+" → "+c.target.toFixed(1))}
       ${card("Investment Potential","$"+c.inv.toFixed(1)+"B")}${card("Jobs",c.jobs.toLocaleString())}${card("Economic Centre",c.econ.toFixed(1)+"/10")}${card("Transit",c.transit)}
     </div>
-    ${tbl(Object.entries(cities).map(([n,x])=>[n,"Tier "+x.tier,x.cluster,"$"+x.inv.toFixed(1)+"B",x.jobs.toLocaleString()]),["City","Tier","Cluster","Investment","Jobs"])}`;
+    ${tbl(Object.entries(cities).map(([n,x])=>[n,"Tier "+x.tier,x.cluster,"$"+x.inv.toFixed(1)+"B",x.jobs.toLocaleString()]),["City","Tier","Cluster","Investment","Jobs"])}
+    <div class="note">Explore confidence-adjusted AI suitability factors and evidence requirements for the selected city.</div><a class="route-link" href="/city-ai-rating.html">Open City AI Rating</a>`;
     document.getElementById("citySelect").onchange=e=>{selectedCity=e.target.value;render()};
   }
 
@@ -509,10 +511,10 @@ function render(){
   }
 
   else if(active==="Development Style & AI"){
-    const ai=[Math.round(70*c.cur+10*c.econ+20*(c.s[3]/10))/10,88,82,86,88,84];
     p.innerHTML=`<h2>Development Style & AI — ${selectedCity}</h2>
     <div class="grid g4">${card("City",selectedCity)}${card("Tier","Tier "+c.tier)}${card("Development Style",c.style)}${card("Transit Recommendation",c.transit)}</div>
-    <div class="grid g3" style="margin-top:12px">${card("Transit AI",ai[0]+"/100")}${card("Urban AI",ai[1]+"/100")}${card("Flood AI",ai[2]+"/100")}${card("Trade AI",ai[3]+"/100")}${card("Employ AI",ai[4]+"/100")}${card("Thames AI",ai[5]+"/100")}</div>
+    <div class="note"><b>City AI models:</b> TransitAI, UrbanAI, ThamesAI, TradeAI, PlantationAI, HydelAI and AirlineAI. No Flood AI model is included. Scores and evidence requirements are shown in the dedicated city rating page.</div>
+    <a class="route-link" href="/city-ai-rating.html">Open City AI Rating</a>
     <div class="note"><b>Transit rule:</b> Tier 1 = metro + suburban/regional rail. Tier 2 = tram/light rail/BRT according to demand and urban form. Tier 3 = infrastructure-led using road width, ROW, demand, junction constraints, existing connectivity and growth.</div>`;
   }
 
@@ -555,6 +557,7 @@ function render(){
       ${card("Fiscal / GST Effect",cr(totalFiscal))}
     </div>
     <div class="note"><b>Important:</b> project revenue/economic activity, wider GVA and direct fiscal revenue are shown separately to avoid double counting.</div>
+    <a class="route-link" href="/roadmap-2036.html">Open 2036 Investment Roadmap</a>
     ${ps.map(x=>`<div class="project">
       <h3>${x.name}</h3>
       <div class="grid g4">
